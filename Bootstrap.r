@@ -48,11 +48,12 @@ for (l in 1:length(arr)){ #Inicializo el caso base
 for (i in 1:n){ #Trabajo para paso i+1
   for(j in 1:((max(arr)*n-1)+1)){
     for(l in 1:length(arr)){
-      aux <- probgraph[i+1,j+arr[k]]
-      probgraph[i+1,j+arr[k]] <- aux + (probgraph[i,j]*p[k])
+      aux <- probgraph[i+1,j+arr[l]]
+      probgraph[i+1,j+arr[l]] <- aux + (probgraph[i,j]*p[l])
     } 
   }
 }
+
 
 #Verifico si la suma da 1.
 versum <- probgraph[n,1]
@@ -80,7 +81,7 @@ for (l in 1:b){
   for(m in 1:k){
     rangoshewart[m] <- max(samples[,m])-min(samples[,m])
   }
-
+  
   mediaTotal <- mean(samples)
   rmedia <- mean(rangoshewart)
   
@@ -120,8 +121,8 @@ for (l in 1:b){
   mediamuestral <- sort(mediamuestral)
   rangoboots <- sort(rangoboots)
   
-  print(mediamuestral)
-  print(rangoboots)
+  #print(mediamuestral)
+  #print(rangoboots)
   
   BootsRango[l,1] <- rangoboots[as.integer((k*b)*0.025)]
   BootsRango[l,2] <- rangoboots[as.integer((k*b)*0.975)]
@@ -129,7 +130,12 @@ for (l in 1:b){
   BootsMedia[l,2] <- mediamuestral[as.integer((k*b)*0.975)]
 }
 
-print(BootsMedia)
-print(BootsRango)
-print(ShewartMedia)
-print(ShewartRango)
+
+
+#print(BootsMedia)
+#print(BootsRango)
+#print(ShewartMedia)
+#print(ShewartRango)
+
+(qplot(1:(max(arr)*(n+2)),probgraph[n,],color=13,main="Distribución de sumas",xlab="Suma",ylab="Probabilidad") + geom_vline(xintercept = BootsMedia[b,1]*n, colour="green") + geom_vline(xintercept = BootsMedia[b,2]*n, colour = "red" ) )
+
