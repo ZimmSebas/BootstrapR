@@ -9,6 +9,7 @@ arr <- c(3,6,9)
 p <- c(0.15,0.5,0.35)
 n <- c(4)
 k <- c(20)
+z <- c(3)
 b1 <- c(100)
 b2 <- c(10000)
 a<-sqrt(n/(n-1))
@@ -87,11 +88,11 @@ for (l in 1:b){
   
   desvio <- rmedia / d2[n]
   
-  ShewartMedia[l,1] <- mediaTotal+(3*desvio)/sqrt(n)
-  ShewartMedia[l,2] <- mediaTotal-(3*desvio)/sqrt(n)
+  ShewartMedia[l,1] <- mediaTotal+(z*desvio)/sqrt(n)
+  ShewartMedia[l,2] <- mediaTotal-(z*desvio)/sqrt(n)
   
-  ShewartRango[l,1] <- rmedia+3*d3[n]*desvio
-  ShewartRango[l,2] <- rmedia-3*d3[n]*desvio
+  ShewartRango[l,1] <- rmedia+z*d3[n]*desvio
+  ShewartRango[l,2] <- rmedia-z*d3[n]*desvio
   
   mediaCol <- array (1:k)
   mediaCol <- colMeans(samples, dims = 1)
@@ -131,11 +132,24 @@ for (l in 1:b){
 }
 
 
-
+#Estos son todos los limites:
 #print(BootsMedia)
 #print(BootsRango)
 #print(ShewartMedia)
 #print(ShewartRango)
 
-(qplot(1:(max(arr)*(n+2)),probgraph[n,],color=13,main="Distribución de sumas",xlab="Suma",ylab="Probabilidad") + geom_vline(xintercept = BootsMedia[b,1]*n, colour="green") + geom_vline(xintercept = BootsMedia[b,2]*n, colour = "red" ) )
+#Esta es la distribucion de probabilidad
+#print(probgraph[n,])
 
+
+#Graficos con limites Shewart y Bootstrap
+#(qplot(1:(max(arr)*(n+2)),probgraph[n,],color=13,main="Distribución de sumas",xlab="Suma",ylab="Probabilidad") + geom_vline(xintercept = ShewartMedia[b,1]*n, colour="green") + geom_vline(xintercept = ShewartMedia[b,2]*n, colour = "red" ) )
+#(qplot(1:(max(arr)*(n+2)),probgraph[n,],color=13,main="Distribución de sumas",xlab="Suma",ylab="Probabilidad") + geom_vline(xintercept = BootsMedia[b,1]*n, colour="green") + geom_vline(xintercept = BootsMedia[b,2]*n, colour = "red" ) )
+
+
+#Calcular los alpha para los 8 arreglos.
+#Distribución de rango.
+#Enviar a un excel.
+#Testear distintos casos.
+#Es equidistante.
+#Dividir distribución de la suma por n
