@@ -10,15 +10,13 @@ p <- c(0.15,0.5,0.35)
 n <- c(4)
 k <- c(20)
 z <- c(3)
+alphainit <- c(0.05)
 b1 <- c(100)
-b2 <- c(10000)
+b2 <- c(1000)
 a<-sqrt(n/(n-1))
 d2 <- c(1.128,1.693,2.059,2.326,2.534,2.704,2.847,2.970,3.078,3.173,3.258,3.336,3.407,3.472,3.532,3.588,3.640,3.689,3.735,3.778,3.819)
 d3 <- c(0.853,0.888,0.880,0.864,0.848,0.833,0.820,0.808,0.797,0.787,0.778,0.770,0.763,0.756,0.750,0.744,0.739,0.733,0.729,0.724,0.720)
 versum <- c(0)
-
-#Aclaro nro de bootstrap
-b <- b1
 
 #Medias y rangos
 mediamuestral <- array(1:2000)
@@ -31,12 +29,21 @@ BootsRango <- matrix(nrow=b, ncol=2)
 ShewartMedia <- matrix(nrow=b, ncol=2)
 ShewartRango <- matrix(nrow=b, ncol=2)
 
-#Probabilidades para graficar
+#Probabilidades para graficar por promedio de suma
 probgraph <- matrix(nrow=n+1,ncol=(max(arr)*(n+2)))
 probacum <- array(1:(max(arr)*(n+2)))
 
+#Probabilidades para graficar por rango
+rangraph <- array(dim = c(max(arr)*(n+2),max(arr)*(n+2),n+1))
+rangacum <- array(1:(max(arr)*(n+2)))
 
-# --------- Algoritmo para graficar probabilidad ---------
+#Aclaro nro de iteraciones bootstrap
+b <- b1
+
+# ------------------------------------------------------------------
+# ------- Algoritmo para graficar por distribucion promedio --------
+# ------------------------------------------------------------------
+
 
 for (l in 1:length(probgraph)){ #inicializo el arreglo
   probgraph[l] <- 0
@@ -70,10 +77,29 @@ qplot(1:(max(arr)*(n+2)),probgraph[n,],color=13,main="Magia",xlab="Cosa A",ylab=
 barplot(probgraph[n,])
 
 
+# ------------------------------------------------------------------
+# --------- Algoritmo para graficar por distribucion rango ---------
+# ------------------------------------------------------------------
+
+for (l in 1:length(rangraph)){ #inicializo el arreglo
+  rangraph[l] <- 0
+}
+
+for (i in 1:length(arr)){ #Preparo caso base
+  rangraph[arr[i],arr[i],1] <- p[i]
+}
+
+#for (i in 1:n){ #Trabajo para paso i+1
+#  for (j in length(arr)){
+#    rangraph[,,i+1] <- rangraph[,,i+1] + rangraph[,,i]
+#  }
+#}
 
 
-# --------- Algoritmo para calcular limites ---------
 
+# ------------------------------------------------------------------
+# --------------- Algoritmo para calcular limites ------------------
+# ------------------------------------------------------------------
 
 
 for (l in 1:b){ 
@@ -125,10 +151,10 @@ for (l in 1:b){
   #print(mediamuestral)
   #print(rangoboots)
   
-  BootsRango[l,1] <- rangoboots[as.integer((k*b)*0.025)]
-  BootsRango[l,2] <- rangoboots[as.integer((k*b)*0.975)]
-  BootsMedia[l,1] <- mediamuestral[as.integer((k*b)*0.025)]
-  BootsMedia[l,2] <- mediamuestral[as.integer((k*b)*0.975)]
+  BootsRango[l,1] <- rangoboots[as.integer((k*b)*alphainit/2)]
+  BootsRango[l,2] <- rangoboots[as.integer((k*b)*(1-alphainit/2))]
+  BootsMedia[l,1] <- mediamuestral[as.integer((k*b)*alphainit/2)]
+  BootsMedia[l,2] <- mediamuestral[as.integer((k*b)*(1-alphainit/2))]
 }
 
 
@@ -143,8 +169,9 @@ for (l in 1:b){
 
 
 #Graficos con limites Shewart y Bootstrap
-#(qplot(1:(max(arr)*(n+2)),probgraph[n,],color=13,main="Distribución de sumas",xlab="Suma",ylab="Probabilidad") + geom_vline(xintercept = ShewartMedia[b,1]*n, colour="green") + geom_vline(xintercept = ShewartMedia[b,2]*n, colour = "red" ) )
-#(qplot(1:(max(arr)*(n+2)),probgraph[n,],color=13,main="Distribución de sumas",xlab="Suma",ylab="Probabilidad") + geom_vline(xintercept = BootsMedia[b,1]*n, colour="green") + geom_vline(xintercept = BootsMedia[b,2]*n, colour = "red" ) )
+vargrafico <- ( 1:(max(arr)*(n+2)))/n
+(qplot(vargrafico,probgraph[n,],color=13,main="Distribución de sumas",xlab="Suma",ylab="Probabilidad") + geom_vline(xintercept = ShewartMedia[b,1], colour="green") + geom_vline(xintercept = ShewartMedia[b,2], colour = "red" ) )
+(qplot(vargrafico,probgraph[n,],color=13,main="Distribución de sumas",xlab="Suma",ylab="Probabilidad") + geom_vline(xintercept = BootsMedia[b,1], colour="green") + geom_vline(xintercept = BootsMedia[b,2], colour = "red" ) )
 
 
 #Calcular los alpha para los 8 arreglos.
