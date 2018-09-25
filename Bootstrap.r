@@ -34,8 +34,11 @@ probgraph <- matrix(nrow=n+1,ncol=(max(arr)*(n+2)))
 probacum <- array(1:(max(arr)*(n+2)))
 
 #Probabilidades para graficar por rango
-rangraph <- array(dim = c(max(arr)*(n+2),max(arr)*(n+2),n+1))
+rangomaxi <- max(arr)-min(arr)
+rangraph <- array(dim = c(length(arr),length(arr),n))
+resrango <- array(dim = c(rangomaxi+1))
 rangacum <- array(1:(max(arr)*(n+2)))
+
 
 #Aclaro nro de iteraciones bootstrap
 b <- b1
@@ -73,8 +76,8 @@ for (i in 2:(max(arr)*(n+2))){
   probacum[i] <- probacum[i-1] + probgraph[n,i]
   versum <- versum + probgraph[n,i]
 }
-qplot(1:(max(arr)*(n+2)),probgraph[n,],color=13,main="Magia",xlab="Cosa A",ylab="Cosa B")
-barplot(probgraph[n,])
+#qplot(1:(max(arr)*(n+2)),probgraph[n,],color=13,main="Magia",xlab="Cosa A",ylab="Cosa B")
+#barplot(probgraph[n,])
 
 
 # ------------------------------------------------------------------
@@ -86,15 +89,38 @@ for (l in 1:length(rangraph)){ #inicializo el arreglo
 }
 
 for (i in 1:length(arr)){ #Preparo caso base
-  rangraph[arr[i],arr[i],1] <- p[i]
+  rangraph[i,i,1] <- p[i]
 }
 
-#for (i in 1:n){ #Trabajo para paso i+1
-#  for (j in length(arr)){
-#    rangraph[,,i+1] <- rangraph[,,i+1] + rangraph[,,i]
-#  }
-#}
+for (it in 2:n){
+  for (mini in 1:length(arr)){
+    for(maxi in 1:length(arr)){
+      for(t in 1:length(arr)){
+        if(arr[t]>arr[maxi]){
+          rangraph[mini,t,it] <- rangraph[mini,t,it] + rangraph[mini,maxi,it-1]*p[t]
+        }
+        else if(arr[t]<arr[mini]){
+          rangraph[t,maxi,it] <- rangraph[t,maxi,it] + rangraph[mini,maxi,it-1]*p[t]
+        }
+        else{
+          rangraph[mini,maxi,it] <- rangraph[mini,maxi,it] + rangraph[mini,maxi,it-1]*p[t]
+        }
+      }
+    } 
+  }
+}
 
+for(i in 1:length(resrango)){
+  resrango[i] <- 0
+}
+
+for(i in 1:length(arr)){
+  for(j in i:length(arr)){
+    resrango[(arr[j]-arr[i])+1] <- resrango[(arr[j]-arr[i])+1] + rangraph[i,j,n] 
+  }
+}
+
+#plot(0:rangomaxi,resrango)
 
 
 # ------------------------------------------------------------------
@@ -170,13 +196,21 @@ for (l in 1:b){
 
 #Graficos con limites Shewart y Bootstrap
 vargrafico <- ( 1:(max(arr)*(n+2)))/n
+
+#Grafico Shewart Media
 (qplot(vargrafico,probgraph[n,],color=13,main="Distribución de sumas",xlab="Suma",ylab="Probabilidad") + geom_vline(xintercept = ShewartMedia[b,1], colour="green") + geom_vline(xintercept = ShewartMedia[b,2], colour = "red" ) )
+
+#Grafico Shewart Rango
+(qplot(0:rangomaxi,resrango,color=13,main="Distribución de rango",xlab="Rango",ylab="Probabilidad") + geom_vline(xintercept = ShewartRango[b,1], colour="green") + geom_vline(xintercept = ShewartRango[b,2], colour = "red" ) )
+
+#Grafico Bootstrap Media
 (qplot(vargrafico,probgraph[n,],color=13,main="Distribución de sumas",xlab="Suma",ylab="Probabilidad") + geom_vline(xintercept = BootsMedia[b,1], colour="green") + geom_vline(xintercept = BootsMedia[b,2], colour = "red" ) )
+
+#Grafico Bootstrap Rango
+(qplot(0:rangomaxi,resrango,color=13,main="Distribución de rango",xlab="Suma",ylab="Probabilidad") + geom_vline(xintercept = BootsRango[b,1], colour="green") + geom_vline(xintercept = BootsRango[b,2], colour = "red" ) )
 
 
 #Calcular los alpha para los 8 arreglos.
-#Distribución de rango.
 #Enviar a un excel.
 #Testear distintos casos.
 #Es equidistante.
-#Dividir distribución de la suma por n
