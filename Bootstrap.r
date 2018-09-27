@@ -1,6 +1,6 @@
 if (!require('ggplot2')) install.packages('ggplot2'); 
 library(ggplot2) 
-#Verifica de instalar la librer√≠a para gr√°ficos
+#Verifica de instalar la librerÌa para gr·ficos
 
 set.seed(140)
 
@@ -9,7 +9,7 @@ arr <- c(3,6,9)
 p <- c(0.15,0.5,0.35)
 n <- c(4)
 k <- c(20)
-z <- c(3)
+z <- c(1.96)
 alphainit <- c(0.05)
 b1 <- c(100)
 b2 <- c(1000)
@@ -185,10 +185,10 @@ for (l in 1:b){
 
 
 #Estos son todos los limites:
-#print(BootsMedia)
-#print(BootsRango)
-#print(ShewartMedia)
-#print(ShewartRango)
+print(BootsMedia)
+print(BootsRango)
+print(ShewartMedia)
+print(ShewartRango)
 
 #Esta es la distribucion de probabilidad
 #print(probgraph[n,])
@@ -198,19 +198,24 @@ for (l in 1:b){
 vargrafico <- ( 1:(max(arr)*(n+2)))/n
 
 #Grafico Shewart Media
-(qplot(vargrafico,probgraph[n,],color=13,main="Distribuci√≥n de sumas",xlab="Suma",ylab="Probabilidad") + geom_vline(xintercept = ShewartMedia[b,1], colour="green") + geom_vline(xintercept = ShewartMedia[b,2], colour = "red" ) )
+(qplot(vargrafico,probgraph[n,],color=13,main="DistribuciÛn de sumas",xlab="Suma",ylab="Probabilidad") + geom_vline(xintercept = ShewartMedia[b,1], colour="green") + geom_vline(xintercept = ShewartMedia[b,2], colour = "red" ) )
 
 #Grafico Shewart Rango
-(qplot(0:rangomaxi,resrango,color=13,main="Distribuci√≥n de rango",xlab="Rango",ylab="Probabilidad") + geom_vline(xintercept = ShewartRango[b,1], colour="green") + geom_vline(xintercept = ShewartRango[b,2], colour = "red" ) )
+(qplot(0:rangomaxi,resrango,color=13,main="DistribuciÛn de rango",xlab="Rango",ylab="Probabilidad") + geom_vline(xintercept = ShewartRango[b,1], colour="green") + geom_vline(xintercept = ShewartRango[b,2], colour = "red" ) )
 
 #Grafico Bootstrap Media
-(qplot(vargrafico,probgraph[n,],color=13,main="Distribuci√≥n de sumas",xlab="Suma",ylab="Probabilidad") + geom_vline(xintercept = BootsMedia[b,1], colour="green") + geom_vline(xintercept = BootsMedia[b,2], colour = "red" ) )
+(qplot(vargrafico,probgraph[n,],color=13,main="DistribuciÛn de sumas",xlab="Suma",ylab="Probabilidad") + geom_vline(xintercept = BootsMedia[b,1], colour="green") + geom_vline(xintercept = BootsMedia[b,2], colour = "red" ) )
 
 #Grafico Bootstrap Rango
-(qplot(0:rangomaxi,resrango,color=13,main="Distribuci√≥n de rango",xlab="Suma",ylab="Probabilidad") + geom_vline(xintercept = BootsRango[b,1], colour="green") + geom_vline(xintercept = BootsRango[b,2], colour = "red" ) )
+(qplot(0:rangomaxi,resrango,color=13,main="DistribuciÛn de rango",xlab="Suma",ylab="Probabilidad") + geom_vline(xintercept = BootsRango[b,1], colour="green") + geom_vline(xintercept = BootsRango[b,2], colour = "red" ) )
 
 
-#Calcular los alpha para los 8 arreglos.
-#Enviar a un excel.
-#Testear distintos casos.
-#Es equidistante.
+# Calcular los alpha a los 100 (para cada uno de los 8) 
+# Calcular los alpha (por sobre los 100) para los 8 arreglos (promedio)
+# Replicaciones de Bootstrap cambia, nuevo bboots = 300
+# Para el rango hacer max con 0
+# Z sale del 1-alpha/2 en la inversa de la acumulada de la normal.
+# Enviar a un excel.
+# Rango y media Shewart est· dado vuelta
+
+# Sacarle los ceros a los graficos
