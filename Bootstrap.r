@@ -1,6 +1,6 @@
 if (!require('ggplot2')) install.packages('ggplot2'); 
-library(ggplot2) 
-#Verifica de instalar la librerï¿½a para grï¿½ficos
+library(ggplot2)
+#Verifica de instalar la librer???a para gr???ficos
 
 set.seed(140)
 
@@ -11,18 +11,18 @@ n <- c(4)
 k <- c(20)
 z <- c(1.96)
 alphainit <- c(0.05)
-b1 <- c(100)
-b2 <- c(1000)
+b <- c(1000)
 bboots <- c(300)
 a<-sqrt(n/(n-1))
 d2 <- c(1.128,1.693,2.059,2.326,2.534,2.704,2.847,2.970,3.078,3.173,3.258,3.336,3.407,3.472,3.532,3.588,3.640,3.689,3.735,3.778,3.819)
 d3 <- c(0.853,0.888,0.880,0.864,0.848,0.833,0.820,0.808,0.797,0.787,0.778,0.770,0.763,0.756,0.750,0.744,0.739,0.733,0.729,0.724,0.720)
-versum <- c(0)
+
 
 #Medias y rangos
-mediamuestral <- array(1:2000)
-rangoboots <- array(1:2000)
+mediamuestral <- array(1:(k*bboots)+1)
+rangoboots <- array(1:(k*bboots)+1)
 rangoshewart <- array(1:k)
+
 
 #Limites
 BootsMedia <- matrix(nrow=b, ncol=2)
@@ -44,6 +44,7 @@ AlphaShewartRangoProm <- array(1:2)
 #Probabilidades para graficar por promedio de suma
 probgraph <- matrix(nrow=n+1,ncol=(max(arr)*(n+2)))
 probacum <- array(1:(max(arr)*(n+2)))
+versum <- c(0)
 
 #Probabilidades para graficar por rango
 rangomaxi <- max(arr)-min(arr)
@@ -51,9 +52,6 @@ rangraph <- array(dim = c(length(arr),length(arr),n))
 resrango <- array(dim = c(rangomaxi+1))
 rangacum <- array(dim = c(rangomaxi+1))
 
-
-#Aclaro nro de iteraciones bootstrap
-b <- b1
 
 # ------------------------------------------------------------------
 # ------- Algoritmo para graficar por distribucion promedio --------
@@ -209,11 +207,13 @@ for (i in 1:b){
   #Calculo alpha de Bootstrap Media
   AlphaBootsMedia[i,1] = probacum[(as.integer(BootsMedia[i,1])*n)]
   #Caso borde donde justo da en el punto
-  if( (as.integer(BootsMedia[i,2])*n) == (BootsMedia[i,2]*n) )  
+  if( (as.integer(BootsMedia[i,2])*n) == (BootsMedia[i,2]*n)) {  
     AlphaBootsMedia[i,2] = 1 - probacum[((as.integer(BootsMedia[i,2])*n))]
-  else
+  }
+  else{
     AlphaBootsMedia[i,2] = 1 - probacum[((as.integer(BootsMedia[i,2])*n)+1)]
-  
+    print(probacum[((as.integer(BootsMedia[i,2])))] )
+  }
   
   #Calculo alpha de Bootstrap Rango
   if( (as.integer(BootsRango[i,1])+1) < 2)
@@ -255,7 +255,7 @@ AlphaShewartMediaProm[2] = mean(AlphaShewartMedia[,2])
 AlphaShewartRangoProm[1] = mean(AlphaShewartRango[,1])
 AlphaShewartRangoProm[2] = mean(AlphaShewartRango[,2])
 # ------------------------------------------------------------------
-# -------------------- Impresiones y GrÃ¡ficos ----------------------
+# -------------------- Impresiones y Gráficos ----------------------
 # ------------------------------------------------------------------
 
 
@@ -266,39 +266,39 @@ AlphaShewartRangoProm[2] = mean(AlphaShewartRango[,2])
 #print(ShewartMedia)
 #print(ShewartRango)
 
-#Estos son los alphas de los lÃ­mites:
-#print(AlphaBootsMedia)
+#Estos son los alphas de los límites:
+print(AlphaBootsMedia)
 #print(AlphaBootsRango)
 #print(AlphaShewartMedia)
 #print(AlphaShewartRango)
 
-#print(AlphaBootsMediaProm)
-#print(AlphaBootsRangoProm)
-#print(AlphaShewartMediaProm)
-#print(AlphaShewartRangoProm)
+print(AlphaBootsMediaProm)
+print(AlphaBootsRangoProm)
+print(AlphaShewartMediaProm)
+print(AlphaShewartRangoProm)
 
 #Esta es la distribucion de probabilidad
 #print(probgraph[n,])
 #print(rangacum)
-
+#print(probacum)
 
 
 #Graficos con limites Shewart y Bootstrap
 vargrafico <- ( 1:(max(arr)*(n+2)))/n
 
 #Grafico Shewart Media
-#(qplot(vargrafico,probgraph[n,],color=13,main="DistribuciÃ³n de sumas",xlab="Suma",ylab="Probabilidad", ylim = c(0.0000000000001,max(probgraph[n,]))) + geom_vline(xintercept = ShewartMedia[b,1], colour="green") + geom_vline(xintercept = ShewartMedia[b,2], colour = "red") )
+(qplot(vargrafico,probgraph[n,],color=13,main="Distribución de sumas",xlab="Suma",ylab="Probabilidad", ylim = c(0.0000000000001,max(probgraph[n,]))) + geom_vline(xintercept = mean(ShewartMedia[,1]), colour="green") + geom_vline(xintercept = mean(ShewartMedia[,2]), colour = "red") )
 
 #Grafico Shewart Rango
-#(qplot(0:rangomaxi,resrango,color=13,main="Distribuciï¿½n de rango",xlab="Rango",ylab="Probabilidad",ylim = c(0.0000000000001,max(resrango))) + geom_vline(xintercept = ShewartRango[b,1], colour="green") + geom_vline(xintercept = ShewartRango[b,2], colour = "red" ) )
+(qplot(0:rangomaxi,resrango,color=13,main="Distribuci???n de rango",xlab="Rango",ylab="Probabilidad",ylim = c(0.0000000000001,max(resrango))) + geom_vline(xintercept = mean(ShewartRango[,1]), colour="green") + geom_vline(xintercept = mean(ShewartRango[,2]), colour = "red" ) )
 
 #Grafico Bootstrap Media
-#(qplot(vargrafico,probgraph[n,],color=13,main="Distribuciï¿½n de sumas",xlab="Suma",ylab="Probabilidad",ylim = c(0.0000000000001,max(probgraph[n,]))) + geom_vline(xintercept = BootsMedia[b,1], colour="green") + geom_vline(xintercept = BootsMedia[b,2], colour = "red" ) )
+(qplot(vargrafico,probgraph[n,],color=13,main="Distribuci???n de sumas",xlab="Suma",ylab="Probabilidad",ylim = c(0.0000000000000000001,max(probgraph[n,]))) + geom_vline(xintercept = mean(BootsMedia[,1]), colour="green") + geom_vline(xintercept = mean(BootsMedia[,2]), colour = "red" ) )
 
 #Grafico Bootstrap Rango
-#(qplot(0:rangomaxi,resrango,color=13,main="Distribuciï¿½n de rango",xlab="Suma",ylab="Probabilidad", ylim = c(0.0000000000001,max(resrango))) + geom_vline(xintercept = BootsRango[b,1], colour="green") + geom_vline(xintercept = BootsRango[b,2], colour = "red" ) )
+(qplot(0:rangomaxi,resrango,color=13,main="Distribuci???n de rango",xlab="Suma",ylab="Probabilidad", ylim = c(0.0000000000001,max(resrango))) + geom_vline(xintercept = mean(BootsRango[,1]), colour="green") + geom_vline(xintercept = mean(BootsRango[,2]), colour = "red" ) )
 
 
 # Z sale del 1-alpha/2 en la inversa de la acumulada de la normal.
-# Enviar a un excel.
-# Mejorar algoritmo de alphas?
+# Enviar a un txt.
+# Ver el tema de e-16
