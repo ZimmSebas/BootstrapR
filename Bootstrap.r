@@ -210,15 +210,8 @@ for (l in 1:b){
 for (i in 1:b){
   
   #Calculo alpha de Bootstrap Media CORRECCION YA HECHA Y VERIFICADA
-  AlphaBootsMedia[i,1] = probacum[as.integer(BootsMedia[i,1]*n-0.0000001)]
-  #Caso borde donde justo da en el punto
-  if( (as.integer(BootsMedia[i,2]*n)) == (BootsMedia[i,2]*n)) {  
-    AlphaBootsMedia[i,2] = 1 - probacum[as.integer(BootsMedia[i,2]*n)]
-  }
-  else{
-    AlphaBootsMedia[i,2] = 1 - probacum[as.integer(BootsMedia[i,2]*n)]
-    print(probacum[((as.integer(BootsMedia[i,2])))] )
-  }
+  AlphaBootsMedia[i,1] = probacum[as.integer(BootsMedia[i,1]*n-0.0000001)+1]
+  AlphaBootsMedia[i,2] = 1 - probacum[as.integer(BootsMedia[i,2]*n)+1]
   
 
   
@@ -231,23 +224,18 @@ for (i in 1:b){
   
    
   #Calculo alpha de Shewart Media CORRECCION YA HECHA Y VERIFICADA
-  AlphaShewartMedia[i,1] = probacum[as.integer(ShewartMedia[i,1]*n-0.0000001)]
-  if( as.integer(ShewartMedia[i,2]*n) == (ShewartMedia[i,2]*n) )  
-    AlphaShewartMedia[i,2] = 1 - probacum[as.integer(ShewartMedia[i,2]*n)]
-  else
-    AlphaShewartMedia[i,2] = 1 - probacum[as.integer(ShewartMedia[i,2]*n)]
-  
+  AlphaShewartMedia[i,1] = probacum[as.integer(ShewartMedia[i,1]*n-0.0000001)+1]
+  AlphaShewartMedia[i,2] = 1 - probacum[as.integer(ShewartMedia[i,2]*n)+1]
+
   
   #Calculo alpha de Shewart Rango CORRECCION YA HACHA Y VERIFICADA  
   if ((as.integer(ShewartRango[i,1]+0.9999999)) < 1 )
     AlphaShewartRango[i,1] = 0
   else
     AlphaShewartRango[i,1] = rangacum[(as.integer(ShewartRango[i,1]-0.0000001))+1]
-  if( as.integer(ShewartRango[i,2]) == ShewartRango[i,2] )  
-    AlphaShewartRango[i,2] = 1 - rangacum[min(length(rangacum),(as.integer(ShewartRango[i,2]))+1)]
-  else
-    AlphaShewartRango[i,2] = 1 - rangacum[min(length(rangacum),(as.integer(ShewartRango[i,2]))+1)]
   
+  AlphaShewartRango[i,2] = 1 - rangacum[min(length(rangacum),(as.integer(ShewartRango[i,2]))+1)]
+
 }
 
 AlphaBootsMediaProm[1] = mean(AlphaBootsMedia[,1])
