@@ -8,7 +8,6 @@ set.seed(140)
 arr <- c(1,2,3,4,5,6,7)
 p <- c(0.3510258583,0.2352996695,0.1577260853,0.1057269567,0.0708708985,0.047506184,0.0318443474)
 n <- c(10)
-k <- c(10)
 z <- c(2.5758293035)
 alphainit <- c(0.01)
 b <- c(250)
@@ -32,7 +31,7 @@ rangacum <- array(dim = c(rangomaxi+1))
 combinaciones <- array(dim = c(8008,length(arr)))
 itcomb <- c(1)
 previo <- array(dim = c(7))
-total = len ^ k
+total = len ^ n
 
 #Limites
 ShewartDesvio <- matrix(nrow=b, ncol=2)
@@ -53,47 +52,6 @@ factorial <- function(m){
 for (i in 1:16){
   fact[i] = factorial(i-1)
 }
-
-print(fact)
-
- 
-# ------------------------------------------------------------------
-# ------- Algoritmo para graficar por distribucion promedio --------
-# ------------------------------------------------------------------
-
-
-for (l in 1:length(probgraph)){ #inicializo el arreglo
-  probgraph[l] <- 0
-}
-
-for (l in 1:length(arr)){ #Inicializo el caso base
-  probgraph[1,arr[l]] <- p[l]
-}
-
-for (i in 1:n){ #Trabajo para paso i+1
-  for(j in 1:((max(arr)*n-1)+1)){
-    for(l in 1:length(arr)){
-      aux <- probgraph[i+1,j+arr[l]]
-      probgraph[i+1,j+arr[l]] <- aux + (probgraph[i,j]*p[l])
-    } 
-  }
-}
-
-
-#Verifico si la suma da 1.
-versum <- probgraph[n,1]
-
-#Preparo la probabilidad acumulada
-probacum <- probgraph[n,1]
-
-for (i in 2:(max(arr)*(n+2))){
-  probacum[i] <- probacum[i-1] + probgraph[n,i]
-  versum <- versum + probgraph[n,i]
-}
-#qplot(1:(max(arr)*(n+2)),probgraph[n,],color=13,main="Magia",xlab="Cosa A",ylab="Cosa B")
-#barplot(probgraph[n,])
-#print(probgraph[n,])
-#print(probacum)
 
 
 # ------------------------------------------------------------------
@@ -122,23 +80,28 @@ for (i in 1:len){
   previo[i] = 0;
 }
 
-generador(len,k,previo);
+generador(len,n,previo);
 
 rangraph <- array(dim = c(length(arr),length(arr),n))
 
-
-print(itcomb)
-print(combinaciones)
+#print(itcomb)
+#print(combinaciones)
 
 suma = 1
 probdesvio = array(dim = c(itcomb))
 
+probsingular = 1
 
 for (i in 1:(itcomb-1)){
+
+  probsingular = 1
+  
   for(j in 1:len){
     suma = suma * fact[(combinaciones[i,j]+1) ]
+    probsingular = probsingular * (p[j] ^ combinaciones[i,j])
   }
-  probdesvio[i] = ((fact[k+1] / suma)/total)
+  
+  probdesvio[i] = ((fact[n+1] / suma) * probsingular)
   suma = 1
 }
 
@@ -151,43 +114,75 @@ versuma = 0
 for (i in 1:(itcomb-1)){
   versuma = versuma+probdesvio[i]
 }
-print(versuma)
+#print(versuma)        #Da 1 ^^
+
 
 calcdesvio = array(dim = c(itcomb))
 mediaaux = 0
 desvioaux = 0
 
 for (i in 1:(itcomb-1)){
+  
+  mediaaux = 0
+  desvioaux = 0
+  
   for(j in 1:len){
     mediaaux = mediaaux + combinaciones[i,j]*j
   }
-  mediaaux = (mediaaux / len)
-  
+  mediaaux = (mediaaux / n)
   for(j in 1:len){
     if(combinaciones[i,j] != 0){
-      desvioaux = ((j-mediaaux)^2)*combinaciones[i,j]
+      desvioaux = desvioaux + ((j-mediaaux)^2)*combinaciones[i,j]
     }
   }
-  
-  calcdesvio[i] = sqrt(desvioaux / k)
-  
+  calcdesvio[i] = sqrt(desvioaux / (n-1))
 }
+
 
 plot(calcdesvio)
 
-# ------------------------------------------------------------------
-# --------------- Algoritmo para calcular limites ------------------
-# ------------------------------------------------------------------
 
+probydesvio <- matrix(nrow=itcomb, ncol=2)
 
-for (l in 1:b){ 
-  samples <- replicate(k, sample(arr,size=n,prob=p,replace=TRUE)) 
-  
-  mediaTotal <- mean(samples)
-  desviomedia <- mean(calcdesvio)
-  
-  ShewartMedia[l,1] <- mediaTotal-(z*desvio)/sqrt(n)
-  ShewartMedia[l,2] <- mediaTotal+(z*desvio)/sqrt(n)
-  
-  
+for (i in 1:(itcomb-1)){
+  probydesvio[i,1] = calcdesvio[i]
+  probydesvio[i,2] = probdesvio[i]
 }
+
+probydesvio <- probydesvio[order(probydesvio[,1]),] 
+print(probydesvio)
+
+distfinal <- matrix(nrow=itcomb, ncol=2)
+
+distfinal[1,1] = probydesvio[1,1]
+distfinal[1,2] = probydesvio[1,2]
+
+dfind <- c(1)
+
+for (i in 1:(itcomb-1)){
+  if( abs (  distfinal[dfind,1] - probydesvio[i,1]) > 1e-05  ) {
+    dfind = dfind + 1
+    distfinal[dfind,1] = probydesvio[i,1]
+    distfinal[dfind,2] = probydesvio[i,2]
+  } else{ 
+    distfinal[dfind,2] = distfinal[dfind,2] + probydesvio[i,2]
+  }
+}
+
+#print(dfind)
+print(distfinal)
+plot(distfinal)
+
+versuma = 0
+
+for (i in 1:(dfind-1)){
+  versuma = versuma+distfinal[i,2]
+}
+
+print(versuma)
+
+plot(distfinal)
+
+write.table(distfinal,"Distribucion Desvio.txt",sep = "\t",row.names = FALSE, col.names = c("Desvio", "Probabilidad"))
+write.csv2(distfinal,"Distribucion Desvio.csv",row.names = FALSE, col.names = c("Desvio", "Probabilidad"))
+
