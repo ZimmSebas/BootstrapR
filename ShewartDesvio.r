@@ -5,7 +5,7 @@ set.seed(140)
 
 #Datos para el algoritmo
 #distribuci?n exponencial d=7
-arr <- c(1,2,3,4,5,6,7)
+arr <- c(1.5,3,4.5,6,7.5,9,10.5)
 p <- c(0.3510258583,0.2352996695,0.1577260853,0.1057269567,0.0708708985,0.047506184,0.0318443474)
 n <- c(10)
 z <- c(2.5758293035)
@@ -93,7 +93,7 @@ probdesvio = array(dim = c(itcomb))
 probsingular = 1
 
 for (i in 1:(itcomb-1)){
-
+  
   probsingular = 1
   
   for(j in 1:len){
@@ -127,18 +127,18 @@ for (i in 1:(itcomb-1)){
   desvioaux = 0
   
   for(j in 1:len){
-    mediaaux = mediaaux + combinaciones[i,j]*j
+    mediaaux = mediaaux + combinaciones[i,j]*arr[j]
   }
   mediaaux = (mediaaux / n)
   for(j in 1:len){
     if(combinaciones[i,j] != 0){
-      desvioaux = desvioaux + ((j-mediaaux)^2)*combinaciones[i,j]
+      desvioaux = desvioaux + ((arr[j]-mediaaux)^2)*combinaciones[i,j]
     }
   }
   calcdesvio[i] = sqrt(desvioaux / (n-1))
 }
 
-
+print(calcdesvio)
 plot(calcdesvio)
 
 
@@ -184,5 +184,5 @@ print(versuma)
 plot(distfinal)
 
 write.table(distfinal,"Distribucion Desvio.txt",sep = "\t",row.names = FALSE, col.names = c("Desvio", "Probabilidad"))
-write.csv2(distfinal,"Distribucion Desvio.csv",row.names = FALSE, col.names = c("Desvio", "Probabilidad"))
+write.csv2(distfinal,"Distribucion Desvio.csv",row.names = FALSE)
 
