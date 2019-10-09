@@ -1,10 +1,6 @@
 if (!require('ggplot2')) install.packages('ggplot2'); 
 library(ggplot2)
 
-if (!require('readxl')) install.packages("readxl"); 
-library(readxl)
-
-
 set.seed(140)
 
 #Datos para el algoritmo
